@@ -1,14 +1,12 @@
 package cs501.hw6.p1
 
 import android.Manifest.permission
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,10 +20,10 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import kotlin.math.abs
-
 
 
 const val THRESHOLD = 0.0035
@@ -55,8 +53,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         if (ContextCompat.checkSelfPermission(
-                this,
-                permission.ACCESS_FINE_LOCATION
+                this, permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
@@ -79,8 +76,7 @@ fun MainScreen(
     var hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
-                context,
-                permission.ACCESS_FINE_LOCATION
+                context, permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         )
     }
@@ -92,9 +88,7 @@ fun MainScreen(
         if (isGranted) {
             try {
                 fusedLocationClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    null
+                    locationRequest, locationCallback, null
                 )
             } catch (e: SecurityException) {
                 Log.e("RequestPermissions", "Security Exception: ${e.message}")
@@ -122,8 +116,7 @@ fun MapScreen(fusedLocationClient: FusedLocationProviderClient) {
     val uiSettings by remember {
         mutableStateOf(
             MapUiSettings(
-                myLocationButtonEnabled = true,
-                zoomControlsEnabled = true
+                myLocationButtonEnabled = true, zoomControlsEnabled = true
             )
         )
     }
@@ -131,8 +124,7 @@ fun MapScreen(fusedLocationClient: FusedLocationProviderClient) {
     val properties by remember {
         mutableStateOf(
             MapProperties(
-                mapType = MapType.NORMAL,
-                isMyLocationEnabled = true
+                mapType = MapType.NORMAL, isMyLocationEnabled = true
             )
         )
     }
@@ -140,18 +132,15 @@ fun MapScreen(fusedLocationClient: FusedLocationProviderClient) {
 
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(
-                context,
-                permission.ACCESS_FINE_LOCATION
+                context, permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location ->
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     location?.let {
                         val initialPosition = LatLng(it.latitude, it.longitude)
                         cameraPositionState.move(
                             CameraUpdateFactory.newLatLngZoom(
-                                initialPosition,
-                                15f
+                                initialPosition, 15f
                             )
                         )
                     }
@@ -166,16 +155,15 @@ fun MapScreen(fusedLocationClient: FusedLocationProviderClient) {
             properties = properties,
             uiSettings = uiSettings,
             onMapClick = { latLng ->
-                if(!alreadyMarked(latLng, markers)) {
+                if (!alreadyMarked(latLng, markers)) {
                     markers = markers + latLng
-                }else {
+                } else {
                     val index = findMarkerIndex(latLng, markers)
-                    if(index != -1) {
+                    if (index != -1) {
                         markers = markers.toMutableList().also { it.removeAt(index) }
                     }
                 }
-            }
-        ) {
+            }) {
 
             markers.forEach { markerLocation ->
                 Marker(
@@ -191,8 +179,8 @@ fun MapScreen(fusedLocationClient: FusedLocationProviderClient) {
 }
 
 fun alreadyMarked(latLng: LatLng, markers: List<LatLng>): Boolean {
-    for(marker in markers) {
-        if(abs(marker.latitude - latLng.latitude) <= THRESHOLD && abs(marker.longitude - latLng.longitude) <= THRESHOLD) {
+    for (marker in markers) {
+        if (abs(marker.latitude - latLng.latitude) <= THRESHOLD && abs(marker.longitude - latLng.longitude) <= THRESHOLD) {
             return true
         }
     }
@@ -200,8 +188,8 @@ fun alreadyMarked(latLng: LatLng, markers: List<LatLng>): Boolean {
 }
 
 fun findMarkerIndex(latLng: LatLng, markers: List<LatLng>): Int {
-    for(marker in markers) {
-        if(abs(marker.latitude - latLng.latitude) <= THRESHOLD && abs(marker.longitude - latLng.longitude) <= THRESHOLD) {
+    for (marker in markers) {
+        if (abs(marker.latitude - latLng.latitude) <= THRESHOLD && abs(marker.longitude - latLng.longitude) <= THRESHOLD) {
             return markers.indexOf(marker)
         }
     }
