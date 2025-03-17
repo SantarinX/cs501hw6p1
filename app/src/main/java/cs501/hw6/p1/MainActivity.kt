@@ -156,9 +156,6 @@ fun MapScreen(fusedLocationClient: FusedLocationProviderClient) {
                         )
                     }
                 }
-                .addOnFailureListener { e ->
-                    Log.e("MapScreen", "Error getting initial location", e)
-                }
         }
     }
 
